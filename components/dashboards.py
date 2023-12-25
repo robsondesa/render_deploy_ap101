@@ -98,7 +98,7 @@ layout = dbc.Col([
                             month_format='Do MMM, YY',
                             end_date_placeholder_text='Data...',
                             start_date=datetime.today(),
-                            end_date=datetime.today() + timedelta(days=31),
+                            end_date=datetime.now(),
                             with_portal=True,
                             updatemode='singledate',
                             id='date-picker-config',
@@ -122,41 +122,66 @@ layout = dbc.Col([
 
 # =========  Callbacks  =========== #
 # Dropdown Receita
-@app.callback([Output("dropdown-receita", "options"),
-    Output("dropdown-receita", "value"),
-    Output("p-receita-dashboards", "children")],
-    Input("store-receitas", "data"))
-def populate_dropdownvalues(data):
+@app.callback(
+    [Output("dropdown-receita", "options"),
+     Output("dropdown-receita", "value"),
+     Output("p-receita-dashboards", "children")],
+    [Input("store-receitas", "data"),
+     Input('date-picker-config', 'start_date'),
+     Input('date-picker-config', 'end_date')])
+def populate_dropdownvalues(data, start_date, end_date):
     df = pd.DataFrame(data)
-    valor = df['Valor'].sum()
-    val = df.Categoria.unique().tolist()
+    df['Data'] = pd.to_datetime(df['Data'])
 
-    return [([{"label": x, "value": x} for x in df.Categoria.unique()]), val, f"R$ {valor}"]
+    # Filtrar por mês
+    mask = (df['Data'] >= start_date) & (df['Data'] <= end_date)
+    df_filtered = df.loc[mask]
+
+    valor = df_filtered['Valor'].sum()
+    val = df_filtered['Categoria'].unique().tolist()
+
+    return [([{"label": x, "value": x} for x in df_filtered['Categoria'].unique()]), val, f"R$ {valor}"]
 
 # Dropdown Despesa
-@app.callback([Output("dropdown-despesa", "options"),
-    Output("dropdown-despesa", "value"),
-    Output("p-despesa-dashboards", "children")],
-    Input("store-despesas", "data"))
-def populate_dropdownvalues(data):
+@app.callback(
+    [Output("dropdown-despesa", "options"),
+     Output("dropdown-despesa", "value"),
+     Output("p-despesa-dashboards", "children")],
+    [Input("store-despesas", "data"),
+     Input('date-picker-config', 'start_date'),
+     Input('date-picker-config', 'end_date')])
+def populate_dropdownvalues(data, start_date, end_date):
     df = pd.DataFrame(data)
-    valor = df['Valor'].sum()
-    val = df.Categoria.unique().tolist()
+    df['Data'] = pd.to_datetime(df['Data'])
 
-    return [([{"label": x, "value": x} for x in df.Categoria.unique()]), val, f"R$ {valor}"]
+    # Filtrar por mês
+    mask = (df['Data'] >= start_date) & (df['Data'] <= end_date)
+    df_filtered = df.loc[mask]
 
-# VALOR - saldo
+    valor = df_filtered['Valor'].sum()
+    val = df_filtered['Categoria'].unique().tolist()
+
+    return [([{"label": x, "value": x} for x in df_filtered['Categoria'].unique()]), val, f"R$ {valor}"]
+
+
 @app.callback(
     Output("p-saldo-dashboards", "children"),
     [Input("store-despesas", "data"),
-    Input("store-receitas", "data")])
-def saldo_total(despesas, receitas):
+    Input("store-receitas", "data"),
+    Input('date-picker-config', 'start_date'),
+    Input('date-picker-config', 'end_date')])
+def saldo_total(despesas, receitas, start_date, end_date):
     df_despesas = pd.DataFrame(despesas)
     df_receitas = pd.DataFrame(receitas)
+
+    # Filtrar por mês
+    df_despesas = df_despesas[(df_despesas['Data'] >= start_date) & (df_despesas['Data'] <= end_date)]
+    df_receitas = df_receitas[(df_receitas['Data'] >= start_date) & (df_receitas['Data'] <= end_date)]
 
     valor = df_receitas['Valor'].sum() - df_despesas['Valor'].sum()
 
     return f"R$ {valor}"
+
     
 # Gráfico 1
 @app.callback(
@@ -223,7 +248,11 @@ def graph2_show(data_receita, data_despesa, receita, despesa, start_date, end_da
 
     df_final = df_final[df_final['Categoria'].isin(receita) | df_final['Categoria'].isin(despesa)]
 
-    fig = px.bar(df_final, x="Data", y="Valor", color='Output', barmode="group")        
+    fig = px.bar(
+    df_final, x="Data", y="Valor", color='Output', barmode="group",
+    color_discrete_map={'Receitas': 'blue', 'Despesas': 'red'}
+)
+        
     fig.update_layout(margin=graph_margin, template=template_from_url(theme))
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 

@@ -25,14 +25,14 @@ from globals import *
 
 # ========= Layout ========= #
 layout = dbc.Card([
-                html.H1("MyBudget", className="text-primary"),
-                html.P("By ASIMOV", className="text-info"),
+                html.H1("AP 101", className="text-primary"),
+                html.P("M & R", className="text-info"),
                 html.Hr(),
 
 
     # Seção PERFIL ------------------------
                 dbc.Button(id='botao_avatar',
-                    children=[html.Img(src="/assets/img_hom.png", id="avatar_change", alt="Avatar", className='perfil_avatar'),
+                    children=[html.Img(src="/assets/img_home.png", id="avatar_change", alt="Avatar", className='perfil_avatar'),
                 ], style={'background-color': 'transparent', 'border-color': 'transparent'}),
 
                 dbc.Modal([
@@ -41,58 +41,17 @@ layout = dbc.Card([
                         dbc.Row([
                             dbc.Col([
                                 dbc.Card([
-                                    dbc.CardImg(src="/assets/img_hom.png", className='perfil_avatar', top=True),
+                                    dbc.CardImg(src="/assets/img_home.png", className='perfil_avatar', top=True),
                                     dbc.CardBody([
-                                        html.H4("Perfil Homem", className="card-title"),
+                                        html.H4("Perfil do AP", className="card-title"),
                                         html.P(
-                                            "Um Card com exemplo do perfil Homem. Texto para preencher o espaço",
+                                            "Este Perfil foi criado exclusivamente para o casal Mariane e Robson do AP 101.",
                                             className="card-text",
                                         ),
                                         dbc.Button("Acessar", color="warning"),
                                     ]),
                                 ]),
-                            ], width=6),
-                            dbc.Col([
-                                dbc.Card([
-                                    dbc.CardImg(src="/assets/img_fem2.png", top=True, className='perfil_avatar'),
-                                    dbc.CardBody([
-                                        html.H4("Perfil Mulher", className="card-title"),
-                                        html.P(
-                                            "Um Card com exemplo do perfil Mulher. Texto para preencher o espaço",
-                                            className="card-text",
-                                        ),
-                                        dbc.Button("Acessar", color="warning"),
-                                    ]),
-                                ]),
-                            ], width=6),
-                        ], style={"padding": "5px"}),
-                        dbc.Row([
-                            dbc.Col([
-                                dbc.Card([
-                                    dbc.CardImg(src="/assets/img_home.png", top=True, className='perfil_avatar'),
-                                    dbc.CardBody([
-                                        html.H4("Perfil Casa", className="card-title"),
-                                        html.P(
-                                            "Um Card com exemplo do perfil Casa. Texto para preencher o espaço",
-                                            className="card-text",
-                                        ),
-                                        dbc.Button("Acessar",  color="warning"),
-                                    ]),
-                                ]),
-                            ], width=6),
-                            dbc.Col([
-                                dbc.Card([
-                                    dbc.CardImg(src="/assets/img_plus.png", top=True, className='perfil_avatar'),
-                                    dbc.CardBody([
-                                        html.H4("Adicionar Novo Perfil", className="card-title"),
-                                        html.P(
-                                            "Esse projeto é um protótipo, o botão de adicionar um novo perfil esta desativado momentaneamente!",
-                                            className="card-text",
-                                        ),
-                                        dbc.Button("Adicionar", color="success"),
-                                    ]),
-                                ]),
-                            ], width=6),
+                            ], width=12),
                         ], style={"padding": "5px"}),
                     ]),
                 ],
@@ -108,14 +67,15 @@ layout = dbc.Card([
             dbc.Row([
                 dbc.Col([
                     dbc.Button(color="success", id="open-novo-receita",
-                            children=["+ Receita"]),
+                            children=["+ Receita"], style={"fontSize": "1em"}),
                 ], width=6),
 
                 dbc.Col([
                     dbc.Button(color="danger", id="open-novo-despesa",
-                            children=["+ Despesa"]),
+                            children=["+ Despesa"], style={"fontSize": "1em"}),
                 ], width=6)
             ]),
+
 
 
             # Modal Receita
@@ -126,7 +86,7 @@ layout = dbc.Card([
                         dbc.Row([
                             dbc.Col([
                                     dbc.Label("Descrição: "),
-                                    dbc.Input(placeholder="Ex.: dividendos da bolsa, herança...", id="txt-receita"),
+                                    dbc.Input(placeholder="Ex.: Descrição...", id="txt-receita"),
                             ], width=6), 
                             dbc.Col([
                                     dbc.Label("Valor: "),
@@ -217,7 +177,7 @@ layout = dbc.Card([
                     dbc.Row([
                         dbc.Col([
                                 dbc.Label("Descrição: "),
-                                dbc.Input(placeholder="Ex.: dividendos da bolsa, herança...", id="txt-despesa"),
+                                dbc.Input(placeholder="Ex.: Descrição...", id="txt-despesa"),
                         ], width=6), 
                         dbc.Col([
                                 dbc.Label("Valor: "),
@@ -296,6 +256,7 @@ layout = dbc.Card([
             is_open=False,
             centered=True,
             backdrop=True),
+
         
 # Seção NAV ------------------------
             html.Hr(),
@@ -303,8 +264,9 @@ layout = dbc.Card([
                 [
                     dbc.NavLink("Dashboard", href="/dashboards", active="exact"),
                     dbc.NavLink("Extratos", href="/extratos", active="exact"),
-                ], vertical=True, pills=True, id='nav_buttons', style={"margin-bottom": "50px"}),
-            ThemeChangerAIO(aio_id="theme", radio_props={"value":dbc.themes.QUARTZ})
+                    dbc.NavLink("Metas", href="/metas", active="exact"),
+                ], vertical=True, pills=True, id='nav_buttons', style={"margin-bottom": "15px"}),
+            ThemeChangerAIO(aio_id="theme", radio_props={"value":dbc.themes.COSMO})
 
         ], id='sidebar_completa'
     )
@@ -329,6 +291,16 @@ def toggle_modal(n1, is_open):
     Output("modal-novo-despesa", "is_open"),
     Input("open-novo-despesa", "n_clicks"),
     State("modal-novo-despesa", "is_open")
+)
+def toggle_modal(n1, is_open):
+    if n1:
+        return not is_open
+    
+# Pop-up meta
+@app.callback(
+    Output("modal-novo-meta", "is_open"),
+    Input("open-novo-meta", "n_clicks"),
+    State("modal-novo-meta", "is_open")
 )
 def toggle_modal(n1, is_open):
     if n1:
@@ -433,7 +405,6 @@ def add_category(n, n2, txt, check_delete, data):
     data_return = df_cat_receita.to_dict()
 
     return [txt1, style1, opt_receita, opt_receita, [], data_return]
-
     
 
 # Enviar Form receita
@@ -483,11 +454,11 @@ def salve_form_receita(n, descricao, valor, date, switches, categoria, dict_rece
         State("txt-despesa", "value"),
         State('store-despesas', 'data')
     ])
-def salve_form_despesa(n, valor, switches, descricao, date, txt, dict_despesas):
+def salve_form_despesa(n, valor, switches, categoria, date, descricao, dict_despesas):
     df_despesas = pd.DataFrame(dict_despesas)
 
     if n and not(valor == "" or valor== None):
-        valor = round(valor, 2)
+        valor = round(float(valor), 2)
         date = pd.to_datetime(date).date()
         categoria = categoria[0] if type(categoria) == list else categoria
 
@@ -497,7 +468,7 @@ def salve_form_despesa(n, valor, switches, descricao, date, txt, dict_despesas):
         if descricao == None or descricao == "":
             descricao = 0
 
-        df_despesas.loc[df_despesas.shape[0]] = [valor, recebido, fixo, date, descricao, txt]
+        df_despesas.loc[df_despesas.shape[0]] = [valor, recebido, fixo, date, categoria, descricao]
         df_despesas.to_csv("df_despesas.csv")
 
     data_return = df_despesas.to_dict()

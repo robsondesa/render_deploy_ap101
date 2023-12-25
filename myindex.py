@@ -7,7 +7,7 @@ import plotly.express as px
 
 # import from folders
 from app import *
-from components import sidebar, dashboards, extratos
+from components import sidebar, dashboards, extratos, metas
 
 # DataFrames and Dcc.Store
 
@@ -17,12 +17,17 @@ df_receitas_aux = df_receitas.to_dict()
 df_despesas = pd.read_csv("df_despesas.csv", index_col=0, parse_dates=True)
 df_despesas_aux = df_despesas.to_dict()
 
+df_metas = pd.read_csv("df_metas.csv", index_col=0, parse_dates=True)
+df_metas_aux = df_metas.to_dict()   
+
 list_receitas = pd.read_csv('df_cat_receita.csv', index_col=0)
 list_receitas_aux = list_receitas.to_dict()
 
 list_despesas = pd.read_csv('df_cat_despesa.csv', index_col=0)
 list_despesas_aux = list_despesas.to_dict()
 
+list_metas = pd.read_csv('df_cat_metas.csv', index_col=0)
+list_metas_aux = list_metas.to_dict()
 
 # =========  Layout  =========== #
 content = html.Div(id="page-content")
@@ -30,8 +35,10 @@ content = html.Div(id="page-content")
 app.layout = dbc.Container(children=[
     dcc.Store(id='store-receitas', data=df_receitas_aux),
     dcc.Store(id="store-despesas", data=df_despesas_aux),
+    dcc.Store(id="store-metas", data=df_metas_aux),
     dcc.Store(id='stored-cat-receitas', data=list_receitas_aux),
     dcc.Store(id='stored-cat-despesas', data=list_despesas_aux),
+    dcc.Store(id='stored-cat-metas', data=list_metas_aux),
     
     dbc.Row([
         dbc.Col([
@@ -48,13 +55,15 @@ app.layout = dbc.Container(children=[
 
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
-def render_page_content(pathname):
+def render_page_content(pathname):  
     if pathname == "/" or pathname == "/dashboards":
         return dashboards.layout
 
     if pathname == "/extratos":
         return extratos.layout
-        
-
+    
+    if pathname == "/metas":
+        return metas.layout
+    
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
