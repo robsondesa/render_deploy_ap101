@@ -1,1 +1,1 @@
-web: gunicorn myindex:server
+web: waitress-serve --call myindex:server
